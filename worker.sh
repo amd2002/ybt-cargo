@@ -1,0 +1,1 @@
+celery -A app.workers.tasks.celery_app worker --loglevel=info --concurrency=2
