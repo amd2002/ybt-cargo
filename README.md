@@ -1,109 +1,108 @@
 # YBT Cargo Manager
 
-Application web de génération automatique de factures cargo.
+Application web de génération automatique de factures cargo pour YBT International Ocean Freight & Logistic.
 
-## Stack
-- **Backend** : FastAPI + Python
-- **Queue** : Celery + Redis
-- **DB** : PostgreSQL
-- **Stockage** : Cloudflare R2
-- **Hébergement** : Railway
+## Ce que fait l'application
 
----
+- Upload d'un fichier Excel YBT → analyse automatique des clients
+- Regroupement des clients par numéro de téléphone (fusion des doublons)
+- Détection automatique de la destination : Sierra Leone (SL) ou Guinée (GN)
+- Double tarif : SL = $280/CBM · GN = $340/CBM (modifiable depuis l'interface)
+- Calcul exact sans arrondi : Freight = (CBM × tarif) ÷ 2 · Custom = (CBM × tarif) ÷ 2
+- Édition manuelle des clients avant génération
+- Génération PDF des factures avec logo YBT
+- Téléchargement ZIP de toutes les factures
+- Liste terrain PDF pour les agents (colonnes statut/signature)
+- Historique des conteneurs avec détails et suppression (PIN)
 
-## Déploiement sur Railway (étape par étape)
+## Stack technique
 
-### 1. Préparer GitHub
+- **Backend** : FastAPI + Python 3.11
+- **Base de données** : PostgreSQL (Supabase)
+- **Génération PDF** : ReportLab
+- **Frontend** : HTML/CSS/JS vanilla
+- **Hébergement** : Local (Windows)
+
+## Installation sur Windows
+
+### Prérequis
+- Python 3.11
+- Git
+
+### Étapes
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/TON_USERNAME/ybt-cargo.git
-git push -u origin main
+git clone https://github.com/amd2002/ybt-cargo.git
+cd ybt-cargo
+
+py -3.11 -m venv venv
+venv\Scripts\activate
+
+pip install fastapi==0.111.0 uvicorn[standard]==0.29.0 sqlalchemy==2.0.30 alembic==1.13.1 python-multipart==0.0.9 pandas==2.2.2 xlrd==2.0.1 openpyxl==3.1.2 python-docx==1.1.2 jinja2==3.1.4 pydantic==2.7.1 pydantic-settings==2.2.1 python-jose[cryptography]==3.3.0 passlib[bcrypt]==1.7.4 httpx==0.27.0 boto3==1.34.110 psycopg2-binary celery==5.3.6 redis==5.0.4 reportlab pillow bcrypt==4.0.1
 ```
 
-### 2. Créer le projet Railway
+### Configuration
 
-1. Aller sur [railway.app](https://railway.app) → **New Project**
-2. Choisir **Deploy from GitHub repo** → sélectionner `ybt-cargo`
-3. Railway détecte le Dockerfile automatiquement
-
-### 3. Ajouter les services Railway
-
-Dans le projet Railway, cliquer **+ New** et ajouter :
-- **PostgreSQL** (plugin Railway)
-- **Redis** (plugin Railway)
-
-Railway génère automatiquement les variables `DATABASE_URL` et `REDIS_URL`.
-
-### 4. Configurer les variables d'environnement
-
-Dans Railway → Variables, ajouter :
+Créer un fichier `.env` dans le dossier `ybt-app` :
 
 ```
-SECRET_KEY=une-cle-secrete-aleatoire-longue
-R2_ACCOUNT_ID=votre-account-id-cloudflare
-R2_ACCESS_KEY_ID=votre-access-key
-R2_SECRET_ACCESS_KEY=votre-secret-key
-R2_BUCKET_NAME=ybt-cargo-pdfs
-R2_PUBLIC_URL=https://votre-bucket.r2.dev
+DATABASE_URL=postgresql://postgres.XXXX:MOTDEPASSE@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres
+SECRET_KEY=ybt-cargo-secret-2024-xK9m
+RATE_SIERRA_LEONE=280
+RATE_GUINEE=340
+REDIS_URL=redis://localhost:6379/0
 ```
 
-### 5. Configurer Cloudflare R2
+### Initialisation base de données
 
-1. Aller sur [dash.cloudflare.com](https://dash.cloudflare.com) → R2
-2. Créer un bucket `ybt-cargo-pdfs`
-3. Dans **Settings** → activer **Public access**
-4. Créer un **API Token** avec permissions R2 Read + Write
-5. Copier Account ID, Access Key, Secret Key
-
-### 6. Ajouter le worker Celery
-
-Dans Railway → **+ New Service** → **Dockerfile** → même repo
-- Dans les settings du service worker, changer la commande :
-  ```
-  celery -A app.workers.tasks.celery_app worker --loglevel=info --concurrency=2
-  ```
-
-### 7. Initialiser la base de données
-
-Dans Railway → votre service web → **Shell** :
 ```bash
 python scripts/init_db.py
 ```
 
-### 8. Ajouter le logo YBT
+### Lancement
 
-Mettre le fichier `ybt_logo.jpg` dans le dossier `assets/` et redéployer.
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
 
----
+Ou double-clic sur `C:\ybt-cargo\start_ybt.bat`
+
+Accès : **http://localhost:8000**
+
+Accès réseau local : **http://172.20.10.2:8000**
 
 ## Utilisation
 
-1. Ouvrir l'URL Railway du projet
-2. Login : `admin` / `ybt2024!` (changer après premier login)
-3. Renseigner le n° conteneur, date, ETA
-4. Uploader le fichier Excel
-5. Corriger les clients si nécessaire
-6. Cliquer **Générer les PDFs**
-7. Télécharger le ZIP
-
----
+1. Ouvrir http://localhost:8000
+2. Renseigner le n° conteneur, date chargement, ETA
+3. Uploader le fichier Excel YBT
+4. Corriger les clients si nécessaire (CBM, destination, nom)
+5. Cliquer **Générer les PDFs**
+6. Télécharger le ZIP des factures
+7. Télécharger la liste terrain pour les agents
 
 ## Modifier les tarifs
 
-- Dans l'interface : cliquer **⚙ Tarifs** en haut à droite
-- Les nouveaux tarifs s'appliquent immédiatement aux prochains uploads
+Cliquer **⚙ Tarifs** en haut à droite de l'interface.
 
----
+## PIN de suppression
 
-## Ajouter un utilisateur
+Le PIN par défaut est `1234`. Pour le changer, modifier la ligne 4 de `frontend/static/js/app.js` :
+```javascript
+const DELETE_PIN = "1234";
+```
 
-Dans le shell Railway :
-```python
-from scripts.init_db import *
-db = SessionLocal()
-user = User(username="ibrahim", hashed_pw=pwd_ctx.hash("motdepasse"), is_admin=False)
-db.add(user); db.commit()
+## Structure du projet
+
+```
+ybt-app/
+├── app/
+│   ├── api/          → routes FastAPI
+│   ├── core/         → config, base de données
+│   ├── models/       → tables PostgreSQL
+│   └── services/     → parser Excel, générateur PDF, résumé terrain
+├── frontend/         → interface web (HTML/CSS/JS)
+├── scripts/          → initialisation base de données
+├── assets/           → logo YBT
+└── start_ybt.bat     → lancement rapide Windows
 ```
