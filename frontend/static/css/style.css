@@ -137,3 +137,17 @@ main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
   .edit-grid { grid-template-columns: 1fr; }
   .item-row { grid-template-columns: 1fr; }
 }
+
+/* ── Boutons action historique ── */
+.btn-action { font-size:12px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:white; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:4px; }
+.btn-action:hover { background:var(--bg); }
+.btn-delete { border-color:#fca5a5; color:#dc2626; }
+.btn-delete:hover { background:#fee2e2; }
+.btn-detail { border-color:#93c5fd; color:#1d4ed8; }
+.btn-detail:hover { background:#dbeafe; }
+
+/* ── Detail panel ── */
+.detail-panel { border-top:1px solid var(--border); background:#f8fafc; }
+
+/* ── Done buttons ── */
+.done-actions { display:flex; flex-direction:column; gap:10px; margin-top:1rem; align-items:center; }

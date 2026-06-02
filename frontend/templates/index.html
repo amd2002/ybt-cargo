@@ -11,10 +11,7 @@
   <div class="header-inner">
     <div class="brand">
       <div class="brand-icon">YBT</div>
-      <div>
-        <div class="brand-name">YBT Cargo Manager</div>
-        <div class="brand-sub">Générateur de factures</div>
-      </div>
+      <div><div class="brand-name">YBT Cargo Manager</div><div class="brand-sub">Générateur de factures</div></div>
     </div>
     <div class="header-actions">
       <span id="rates-display" class="rates-badge"></span>
@@ -24,23 +21,13 @@
 </header>
 
 <main>
-  <!-- ÉTAPE 1 : Upload -->
   <section id="step-upload" class="step active">
     <div class="card upload-card">
       <h2>Nouveau conteneur</h2>
       <div class="form-grid">
-        <div class="field">
-          <label>N° Conteneur</label>
-          <input type="text" id="container-num" placeholder="CAAU6090649" />
-        </div>
-        <div class="field">
-          <label>Date chargement</label>
-          <input type="text" id="load-date" placeholder="29/5/2026" />
-        </div>
-        <div class="field">
-          <label>ETA (arrivée estimée)</label>
-          <input type="text" id="eta" placeholder="8/8/2026" />
-        </div>
+        <div class="field"><label>N° Conteneur</label><input type="text" id="container-num" placeholder="CAAU6090649" /></div>
+        <div class="field"><label>Date chargement</label><input type="text" id="load-date" placeholder="29/5/2026" /></div>
+        <div class="field"><label>ETA (arrivée estimée)</label><input type="text" id="eta" placeholder="8/8/2026" /></div>
       </div>
       <div class="upload-zone" id="upload-zone">
         <input type="file" id="file-input" accept=".xls,.xlsx" hidden>
@@ -49,13 +36,10 @@
         <div class="upload-sub">ou cliquer pour sélectionner (.xls / .xlsx)</div>
         <div class="upload-filename" id="upload-filename"></div>
       </div>
-      <button class="btn-primary" id="btn-upload" onclick="uploadFile()">
-        Analyser le fichier →
-      </button>
+      <button class="btn-primary" id="btn-upload" onclick="uploadFile()">Analyser le fichier →</button>
     </div>
   </section>
 
-  <!-- ÉTAPE 2 : Édition clients -->
   <section id="step-edit" class="step">
     <div class="toolbar">
       <div>
@@ -63,17 +47,13 @@
         <div class="stats-row" id="stats-row"></div>
       </div>
       <div class="toolbar-actions">
-        <button class="btn-ghost" onclick="goBack()">← Retour</button>
-        <button class="btn-primary" onclick="generateAll()">
-          Générer les PDFs →
-        </button>
+        <button class="btn-ghost dark" onclick="goBack()">← Retour</button>
+        <button class="btn-primary" onclick="generateAll()">Générer les PDFs →</button>
       </div>
     </div>
-
     <div class="client-list" id="client-list"></div>
   </section>
 
-  <!-- ÉTAPE 3 : Génération -->
   <section id="step-generating" class="step">
     <div class="card center-card">
       <div class="spinner"></div>
@@ -83,48 +63,33 @@
     </div>
   </section>
 
-  <!-- ÉTAPE 4 : Résultat -->
   <section id="step-done" class="step">
     <div class="card center-card success-card">
       <div class="success-icon">✓</div>
       <h2>Factures prêtes !</h2>
       <p class="muted" id="done-summary"></p>
-      <a id="btn-download" class="btn-primary" href="#" download>
-        Télécharger le ZIP
-      </a>
-      <button class="btn-ghost" onclick="goHome()" style="margin-top:8px;">
-        Nouveau conteneur
-      </button>
+      <div class="done-actions">
+        <a id="btn-download-zip" class="btn-primary" href="#" download>📦 Télécharger les PDFs (ZIP)</a>
+        <a id="btn-download-summary" class="btn-primary" href="#" target="_blank" style="background:#0f6e56;">📋 Télécharger la liste terrain</a>
+        <button class="btn-ghost dark" onclick="goHome()" style="margin-top:4px;">Nouveau conteneur</button>
+      </div>
     </div>
   </section>
 
-  <!-- Historique -->
   <section id="history-section">
-    <h3 style="margin:2rem 0 1rem; color:var(--text-secondary);">Historique</h3>
+    <h3 style="margin:2rem 0 1rem;color:var(--text-secondary);">Historique</h3>
     <div id="history-list" class="history-list"></div>
   </section>
 </main>
 
-<!-- Modal Paramètres -->
 <div id="modal-settings" class="modal-backdrop" style="display:none">
   <div class="modal">
-    <div class="modal-header">
-      <h3>Tarifs ($/CBM)</h3>
-      <button class="btn-close" onclick="closeSettings()">✕</button>
-    </div>
+    <div class="modal-header"><h3>Tarifs ($/CBM)</h3><button class="btn-close" onclick="closeSettings()">✕</button></div>
     <div class="modal-body">
-      <div class="field">
-        <label>Sierra Leone (SL)</label>
-        <input type="number" id="rate-sl" step="1" />
-      </div>
-      <div class="field">
-        <label>Guinée (GN)</label>
-        <input type="number" id="rate-gn" step="1" />
-      </div>
+      <div class="field"><label>Sierra Leone (SL)</label><input type="number" id="rate-sl" step="1" /></div>
+      <div class="field"><label>Guinée (GN)</label><input type="number" id="rate-gn" step="1" /></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-primary" onclick="saveTariffs()">Enregistrer</button>
-    </div>
+    <div class="modal-footer"><button class="btn-primary" onclick="saveTariffs()">Enregistrer</button></div>
   </div>
 </div>
 
